@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест на перетягування: Типи дихання</title>
+    <style>
+        /* Основні стилі */
+        body {
+            font-family: 'Comic Sans MS', sans-serif;
+            background: linear-gradient(45deg, #0f2027, #203a43, #2c5364);
+            color: #f0f0f0;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            width: 70%;
+            max-width: 800px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+        }
+        h2 {
+            font-size: 2em;
+            color: #ffeb3b;
+            text-shadow: 1px 1px 2px #333;
+        }
+        .dropzone {
+            padding: 15px;
+            margin: 20px auto;
+            border: 2px dashed #ffeb3b;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.2);
+            min-height: 70px;
+            font-size: 1.1em;
+            color: #ffeb3b;
+            transition: background-color 0.3s ease;
+        }
+        .dropzone:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        .draggable {
+            padding: 10px 20px;
+            background-color: #03a9f4;
+            color: #fff;
+            border-radius: 8px;
+            margin: 10px;
+            cursor: grab;
+            font-size: 1.2em;
+            display: inline-block;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s ease;
+        }
+        .draggable:active {
+            transform: scale(1.1);
+            cursor: grabbing;
+        }
+        .draggable:hover {
+            background-color: #0288d1;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.6em;
+            color: #76ff03;
+            text-shadow: 1px 1px 2px #333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Тест на перетягування: Типи дихання мікроорганізмів</h2>
+    <p>Перетягніть правильний тип дихання до відповідного визначення:</p>
+    
+    <!-- Контейнери для визначень (завдання) -->
+    <div id="taskContainer"></div>
+    
+    <!-- Контейнери для відповідей -->
+    <div id="answerContainer"></div>
+
+    <div class="result" id="result"></div>
+</div>
+
+<script>
+    // Масив визначень і відповідей
+    const tasks = [
+        "Мікроорганізми, що живуть лише в кисневих умовах",
+        "Мікроорганізми, що живуть лише у безкисневих умовах",
+        "Мікроорганізми, що живуть як в кисневих, так і в безкисневих умовах",
+        "Мікроорганізми, що живуть при дуже малих кількостях кисню"
+    ];
+
+    const answers = [
+        { id: "aerobes", text: "Аероби" },
+        { id: "anaerobes", text: "Анаероби" },
+        { id: "facultative", text: "Факультативні анаероби" },
+        { id: "microaerophiles", text: "Мікроаерофіли" }
+    ];
+
+    // Функція для перемішування масивів
+    function shuffle(array) {
+        array.sort(() => Math.random() - 0.5);
+    }
+
+    // Генеруємо контейнери для завдань
+    function loadTasks() {
+        shuffle(tasks);
+        const taskContainer = document.getElementById("taskContainer");
+        taskContainer.innerHTML = "";
+        tasks.forEach((task, index) => {
+            taskContainer.innerHTML += `
+                <div class="dropzone" data-answer="${answers[index].id}" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    ${task}
+                </div>
+            `;
+        });
+    }
+
+    // Генеруємо контейнери для відповідей
+    function loadAnswers() {
+        shuffle(answers);
+        const answerContainer = document.getElementById("answerContainer");
+        answerContainer.innerHTML = "";
+        answers.forEach(answer => {
+            answerContainer.innerHTML += `
+                <div class="draggable" draggable="true" ondragstart="drag(event)" id="${answer.id}">
+                    ${answer.text}
+                </div>
+            `;
+        });
+    }
+
+    // Перевірка відповідей
+    function checkCompletion() {
+        const dropzones = document.querySelectorAll('.dropzone');
+        let correct = true;
+        
+        dropzones.forEach(zone => {
+            const answerId = zone.getAttribute('data-answer');
+            if (!zone.querySelector(`#${answerId}`)) {
+                correct = false;
+            }
+        });
+        
+        if (correct) {
+            document.getElementById('result').innerText = 'Вітаємо! Ви правильно розподілили всі типи дихання.';
+        }
+    }
+
+    // Функції перетягування
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        const data = ev.dataTransfer.getData("text");
+        ev.target.appendChild(document.getElementById(data));
+        checkCompletion();
+    }
+
+    // Завантаження завдань і відповідей при завантаженні сторінки
+    window.onload = function() {
+        loadTasks();
+        loadAnswers();
+    };
+</script>
+
+</body>
+</html>
